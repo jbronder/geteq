@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
-  "time"
+	"time"
 )
 
 type Options struct {
@@ -111,8 +111,8 @@ func humanize(recs []*CSVRecord) {
 	//Date       Time     Mag   Place                            Lat    Long
 	fmt.Printf("%s %18s %-40s %-4s %4s\n", "Date-Time", "Mag", "Place", "Lat", "Long")
 	for i := range recs {
-    dateTimeVal := processTime(recs[i].time)
-    dateTimeStr := stringifyDateTime(dateTimeVal)
+		dateTimeVal := processTime(recs[i].time)
+		dateTimeStr := stringifyDateTime(dateTimeVal)
 		fmt.Fprintf(os.Stdout, "%s %3.2f %-40s %4.2f %4.2f\n",
 			dateTimeStr, recs[i].mag, recs[i].place, recs[i].latitude, recs[i].longitude)
 	}
@@ -146,16 +146,16 @@ func createCSVRecords(resContent []byte) []*CSVRecord {
 }
 
 func processTime(timeStr string) time.Time {
-  tVal, err := time.Parse(time.RFC3339Nano, timeStr)
-  if err != nil {
-    log.Fatal(err)
-  }
-  return tVal
+	tVal, err := time.Parse(time.RFC3339Nano, timeStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return tVal
 }
 
 func stringifyDateTime(tVal time.Time) string {
-  year, month, day := tVal.Date()
-  hour, min, sec := tVal.Clock()
-  result := fmt.Sprintf("%d %v %d - %d:%d:%d", year, month, day, hour, min, sec)
-  return result
+	year, month, day := tVal.Date()
+	hour, min, sec := tVal.Clock()
+	result := fmt.Sprintf("%d %v %d - %d:%d:%d", year, month, day, hour, min, sec)
+	return result
 }
