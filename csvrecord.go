@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -37,8 +39,8 @@ const (
 )
 
 /*
-Assumes all records have 22 fields.
-Each record string[] needs to be processed sequentially to
+Assumes all records have 22 fields. Each record string[] needs to be processed
+equentially
 */
 func NewRecord(record []string) *CSVRecord {
 	if len(record) != NUM_CSV_FIELDS {
@@ -101,5 +103,47 @@ func processInt(rec string) int {
 		return -1
 	} else {
 		return int(intField)
+	}
+}
+
+// createCSVRecords processes the CSV data received from the server and creates
+// individual records out of each line CSV data
+func createCSVRecords(resContent []byte) []*CSVRecord {
+	strContent := string(resContent)
+	csvReader := csv.NewReader(strings.NewReader(strContent))
+
+	var records []*CSVRecord
+
+	for {
+		record, err := csvReader.Read()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		}
+
+		if !strings.Contains(record[0], "time") {
+			csvRec := NewRecord(record)
+			records = append(records, csvRec)
+		}
+	}
+
+	return records
+}
+
+// humanize outputs a human readable table that fits within a terminal.
+// It outputs fields that a person curious about earthquake occurrences may be
+// commonly interested in such as: Date, time, magnitude, where it occurred, and
+// the latitude and longitudinal coordinates of the location.
+func humanizeCSV(recs []*CSVRecord) {
+	//Date       Time     Mag   Place                            Lat    Long
+	fmt.Printf("%s %18s %-40s %-4s %4s\n", "Date-Time", "Mag", "Place", "Lat", "Long")
+	for i := range recs {
+		dateTimeVal := processTime(recs[i].time)
+		dateTimeStr := stringifyDateTime(dateTimeVal)
+		fmt.Fprintf(os.Stdout, "%s %3.2f %-40s %4.2f %4.2f\n",
+			dateTimeStr, recs[i].mag, recs[i].place, recs[i].latitude, recs[i].longitude)
 	}
 }
