@@ -3,6 +3,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -17,6 +18,10 @@ type Options struct {
 	magnitude string
 }
 
+var ErrFlagMagOption = errors.New("magnitude option invalid")
+var ErrFlagRangeOption = errors.New("time interval option invalid")
+var ErrFlagFormatOption = errors.New("format option invalid")
+
 const (
 	ENDPOINT = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary"
 )
@@ -28,7 +33,10 @@ func main() {
 	flag.Parse()
 
 	opts := &Options{*formatFlag, *timeFlag, *magFlag}
-	fileName := extractFileName(opts)
+	fileName, err := extractFileName(opts)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	response, err := http.Get(ENDPOINT + fileName)
 	if err != nil {
@@ -56,7 +64,7 @@ func main() {
 
 // extractFileName parses the command line Options object and returns a string
 // filling in the designated file name to send to the server.
-func extractFileName(cmdOpt *Options) string {
+func extractFileName(cmdOpt *Options) (string, error) {
 	var magRange string
 	switch cmdOpt.magnitude {
 	case "major":
@@ -70,7 +78,7 @@ func extractFileName(cmdOpt *Options) string {
 	case "all":
 		magRange = "all"
 	default:
-		fmt.Println("todo") // is this needed?
+		return "", ErrFlagMagOption
 	}
 
 	var timeRange string
@@ -84,7 +92,7 @@ func extractFileName(cmdOpt *Options) string {
 	case "month":
 		timeRange = "month"
 	default:
-		fmt.Println("todo") // is this needed?
+		return "", ErrFlagRangeOption
 	}
 
 	var fileSuffix string
@@ -95,10 +103,12 @@ func extractFileName(cmdOpt *Options) string {
 		fileSuffix = "csv"
 	case "json":
 		fileSuffix = "geojson"
+	default:
+		return "", ErrFlagFormatOption
 	}
 
 	endpointFile := fmt.Sprintf("/%s_%s.%s", magRange, timeRange, fileSuffix)
-	return endpointFile
+	return endpointFile, nil
 }
 
 func processTime(timeStr string) time.Time {
