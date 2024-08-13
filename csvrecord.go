@@ -3,10 +3,12 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
+	"log"
 	"io"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type CSVRecord struct {
@@ -131,6 +133,14 @@ func createCSVRecords(resContent []byte) []*CSVRecord {
 	}
 
 	return records
+}
+
+func processTime(timeStr string) time.Time {
+	tVal, err := time.Parse(time.RFC3339Nano, timeStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return tVal
 }
 
 // humanize outputs a human readable table that fits within a terminal.
