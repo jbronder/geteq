@@ -81,11 +81,16 @@ func extractFeatures(res []byte) Features {
 }
 
 func stdoutFeatures(features Features) {
-	fmt.Printf("%s %18s %-40s %-4s %4s\n", "Date-Time", "Mag", "Place", "Lat", "Long")
+	if len(features) == 0 {
+		fmt.Fprintf(os.Stdout, "No records matched under the given criteria.\n")
+		return
+	}
+	
+	fmt.Printf("%s %13s %6s %40s %6s\n", "Date-Time", "Mag", "Place", "Lat", "Long")
 	for _, f := range features {
-		dateTimeVal := time.Unix(f.Props.Time, 0)
-		dateTimeStr := stringifyDateTime(dateTimeVal)
-		fmt.Fprintf(os.Stdout, "%s %3.2f %-40s %4.2f %4.2f\n",
+		dateTimeVal := time.UnixMilli(f.Props.Time).UTC()
+		dateTimeStr := dateTimeVal.Format(time.DateTime)
+		fmt.Fprintf(os.Stdout, "%s %3.2f %-41s %6.2f %7.2f\n",
 			dateTimeStr, f.Props.Mag, f.Props.Place, f.Geo.Coordinates[1], f.Geo.Coordinates[0])
 	}
 }
