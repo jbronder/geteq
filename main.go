@@ -1,5 +1,3 @@
-/*
- */
 package main
 
 import (
@@ -7,8 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -28,27 +26,31 @@ const (
 
 func main() {
 	formatFlag := flag.String("format", "human", "string - {human, json, csv}")
-	timeFlag := flag.String("time", "hour", "string - {hour, day, week, month}")
+	timeFlag := flag.String("time", "month", "string - {hour, day, week, month}")
 	magFlag := flag.String("mag", "major", "string - {all, 1.0, 2.5, 4.5, major}")
 	flag.Parse()
 
 	opts := &Options{*formatFlag, *timeFlag, *magFlag}
 	fileName, err := extractFileName(opts)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(1)
 	}
 
 	response, err := http.Get(ENDPOINT + fileName)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(1)
 	}
+	defer response.Body.Close()
 
 	bContent, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(1)
 	}
 
-	// flag switches from command line args to
+	// Standard output format
 	switch opts.format {
 	case "human":
 		features := extractFeatures(bContent)
@@ -57,8 +59,6 @@ func main() {
 		fmt.Println(string(bContent))
 	case "json":
 		fmt.Println(string(bContent))
-	default:
-		fmt.Println("todo")
 	}
 }
 
@@ -109,14 +109,6 @@ func extractFileName(cmdOpt *Options) (string, error) {
 
 	endpointFile := fmt.Sprintf("/%s_%s.%s", magRange, timeRange, fileSuffix)
 	return endpointFile, nil
-}
-
-func processTime(timeStr string) time.Time {
-	tVal, err := time.Parse(time.RFC3339Nano, timeStr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return tVal
 }
 
 func stringifyDateTime(tVal time.Time) string {
