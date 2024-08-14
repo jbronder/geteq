@@ -86,7 +86,7 @@ func stdoutFeatures(features Features) {
 		return
 	}
 	
-	fmt.Printf("%s %13s %6s %40s %6s\n", "Date-Time", "Mag", "Place", "Lat", "Long")
+	fmt.Printf("%s %s %6s %40s %6s\n", "Date-Time UTC+00:00", "Mag", "Place", "Lat", "Long")
 	for _, f := range features {
 		dateTimeVal := time.UnixMilli(f.Props.Time).UTC()
 		dateTimeStr := dateTimeVal.Format(time.DateTime)
