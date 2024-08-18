@@ -53,8 +53,12 @@ func main() {
 	// Standard output format
 	switch opts.format {
 	case "human":
-		features := extractFeatures(bContent)
-		stdoutFeatures(features)
+		if features, err := extractFeatures(bContent); err != nil {
+			fmt.Fprint(os.Stderr, "%s\n", err)
+			os.Exit(1)
+		} else {
+		  stdoutFeatures(features)
+		}
 	case "csv":
 		fmt.Println(string(bContent))
 	case "json":

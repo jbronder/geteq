@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"time"
 )
@@ -66,18 +65,18 @@ type Geometry struct {
 	Coordinates []float64 `json:"coordinates"`
 }
 
-func extractFeatures(res []byte) Features {
+func extractFeatures(res []byte) (Features, error) {
 	var usgsRes USGSResponse
 	err := json.Unmarshal(res, &usgsRes)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	f := make(Features, 0, len(usgsRes.Features))
 	for _, v := range usgsRes.Features {
 		f = append(f, v)
 	}
-	return f
+	return f, nil
 }
 
 func stdoutFeatures(features Features) {
