@@ -1,4 +1,4 @@
-package main
+package logic
 
 import (
 	"encoding/json"
@@ -65,7 +65,7 @@ type Geometry struct {
 	Coordinates []float64 `json:"coordinates"`
 }
 
-func extractFeatures(res []byte) (Features, error) {
+func ExtractFeatures(res []byte) (Features, error) {
 	var usgsRes USGSResponse
 	err := json.Unmarshal(res, &usgsRes)
 	if err != nil {
@@ -79,7 +79,7 @@ func extractFeatures(res []byte) (Features, error) {
 	return f, nil
 }
 
-func stdoutFeatures(features Features) {
+func StdoutFeatures(features Features) {
 	if len(features) == 0 {
 		fmt.Fprintf(os.Stdout, "No records matched under the given criteria.\n")
 		return
