@@ -157,3 +157,10 @@ func humanizeCSV(recs []*CSVRecord) {
 			dateTimeStr, recs[i].mag, recs[i].place, recs[i].latitude, recs[i].longitude)
 	}
 }
+
+func stringifyDateTime(tVal time.Time) string {
+	year, month, day := tVal.Date()
+	hour, min, sec := tVal.Clock()
+	result := fmt.Sprintf("%d %v %d - %d:%d:%d", year, month, day, hour, min, sec)
+	return result
+}
