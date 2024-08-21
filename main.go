@@ -1,9 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/jbronder/geteq/cmd"
 )
 
