@@ -7,15 +7,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var formatFlag string
-var magFlag string
-var timeFlag string
+var RtFormatFlag string
+var RtMagFlag string
+var RtTimeFlag string
 
 func init() {
 	rootCmd.AddCommand(realtimeCmd)
-	realtimeCmd.Flags().StringVarP(&formatFlag, "format", "f", "table", "output format options: {csv, json, table}")
-	realtimeCmd.Flags().StringVarP(&magFlag, "mag", "m", "major", "magnitude options: {all, 1.0, 2.5, 4.5, major}")
-	realtimeCmd.Flags().StringVarP(&timeFlag, "time", "t", "month", "time range options: {hour, day, week, month}")
+	realtimeCmd.Flags().StringVarP(&RtFormatFlag, "output", "o", "table", "output format options: {csv, json, table}")
+	realtimeCmd.Flags().StringVarP(&RtMagFlag, "mag", "m", "major", "magnitude options: {all, 1.0, 2.5, 4.5, major}")
+	realtimeCmd.Flags().StringVarP(&RtTimeFlag, "time", "t", "month", "time range options: {hour, day, week, month}")
 }
 
 var realtimeCmd = &cobra.Command{
@@ -23,7 +23,7 @@ var realtimeCmd = &cobra.Command{
 	Aliases: []string{"real", "rt"},
 	Short:   "query real-time earthquake data",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fileEndpoint, err := logic.ExtractFileName(formatFlag, magFlag, timeFlag)
+		fileEndpoint, err := logic.ExtractRTParams(RtFormatFlag, RtMagFlag, RtTimeFlag)
 		if err != nil {
 			return err
 		}
@@ -33,7 +33,7 @@ var realtimeCmd = &cobra.Command{
 		}
 
 		// Standard output format
-		switch formatFlag {
+		switch RtFormatFlag {
 		case "table":
 			features, err := logic.ExtractFeatures(content)
 			if err != nil {
