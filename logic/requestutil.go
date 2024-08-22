@@ -106,7 +106,6 @@ func ExtractFDSNParams(endCmd, magFlag, formatFlag, dateTimeFlag string) (string
 		return "", ErrFlagFormatOption
 	}
 
-	// NOTE: dateTimeFlag is noop right now
 	from, to, err := extractMagnitude(magFlag)
 	if err != nil {
 		return "", err
@@ -152,6 +151,10 @@ func ExtractFDSNParams(endCmd, magFlag, formatFlag, dateTimeFlag string) (string
 
 /* >= <= 4.0 and ranges 4.45-6.0....*/
 func extractMagnitude(mFlag string) (string, string, error) {
+
+	if len(mFlag) == 0 {
+		return "", "", nil
+	}
 
 	if strings.ContainsAny(mFlag, ALPHABET) {
 		return "", "", ErrFlagMagOption
