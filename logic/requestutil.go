@@ -161,7 +161,7 @@ func extractMagnitude(mFlag string) (string, string, error) {
 	}
 
 	// process magnitude range
-	if strings.Contains(mFlag, "-") {
+	if strings.Contains(mFlag, "-") && strings.Count(mFlag, "-") == 1 {
 		fields := strings.Split(mFlag, "-")
 		lower := strings.TrimSpace(fields[0])
 		upper := strings.TrimSpace(fields[1])
@@ -189,8 +189,8 @@ func extractMagnitude(mFlag string) (string, string, error) {
 
 	// exact magnitude
 	if strings.ContainsAny(mFlag, "0123456789") {
-		lower := mFlag
-		upper := mFlag
+		lower := strings.TrimSpace(mFlag)
+		upper := strings.TrimSpace(mFlag)
 		return lower, upper, nil
 	}
 
@@ -221,10 +221,15 @@ func extractTime(tFlag string) (string, string, error) {
 }
 
 func parseTime(timeStr string) (string, error) {
+
+	if strings.Count(timeStr, ":") == 2 && strings.Count(timeStr, "T") == 1 {
+		timeStr = timeStr + "Z"
+	}
+
 	timeFormats := []string{time.RFC3339, time.DateOnly}
 	for _, tf := range timeFormats {
 		if t, err := time.Parse(tf, timeStr); err == nil {
-			return t.String(), nil
+			return t.Format(tf), nil
 		}
 	}
 	return "", ErrFlagTimeOption
