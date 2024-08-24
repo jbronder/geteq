@@ -56,11 +56,11 @@ func ExtractRTParams(formatFlag, magFlag, timeFlag string) (string, error) {
 	var fileSuffix string
 	switch formatFlag {
 	case "table":
+		fallthrough
+	case "json":
 		fileSuffix = "geojson"
 	case "csv":
 		fileSuffix = "csv"
-	case "json":
-		fileSuffix = "geojson"
 	default:
 		return "", ErrFlagFormatOption
 	}
@@ -203,6 +203,10 @@ func extractTime(tFlag string) (string, string, error) {
 		fields := strings.Split(tFlag, ",")
 		begin := strings.TrimSpace(fields[0])
 		end := strings.TrimSpace(fields[1])
+
+		if len(begin) == 0 && len(end) == 0 {
+			return "", "", nil
+		}
 
 		validBegin, err := parseTime(begin)
 		if err != nil {
