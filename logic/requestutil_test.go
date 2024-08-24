@@ -63,6 +63,8 @@ func TestParseTime(t *testing.T) {
 	tTests := []ParseTimeTest{
 		{"2024-01-01", "2024-01-01", nil},
 		{"2024-12-01T12:34:56", "2024-12-01T12:34:56Z", nil},
+		{"-12-01", "", ErrFlagTimeOption},
+		{"20-12-01", "", ErrFlagTimeOption},
 		{"2024-12-01T", "", ErrFlagTimeOption},
 	}
 
