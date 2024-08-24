@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	_"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -9,15 +8,14 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "geteq",
-	Short: "geteq returns real-time earthquake data from USGS",
-	Long:  `geteq: A CLI tool to obtain real-time earthquake data from USGS in
-	multiple formats including the terminal in a human readable format.`,
+	Short: "geteq returns real-time and historical earthquake records from USGS",
+	Long: `geteq: A CLI tool to obtain real-time and historical earthquake records from USGS in
+	multiple formats including the terminal in a tabular format.`,
 }
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		// throws the error at the end after printing the Usage prompt
-		// fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+		// Errors are caught from individual cobra.Command RunE functions
 		os.Exit(1)
 	}
 }
