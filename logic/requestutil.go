@@ -13,6 +13,7 @@ import (
 var ErrFlagMagOption = errors.New("--magnitude option invalid")
 var ErrFlagTimeOption = errors.New("--time interval option invalid")
 var ErrFlagFormatOption = errors.New("--output format option invalid")
+var ErrEventIdInvalid = errors.New("eventid invalid")
 
 const (
 	RTENDPOINT   = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary"
@@ -237,4 +238,58 @@ func parseTime(timeStr string) (string, error) {
 		}
 	}
 	return "", ErrFlagTimeOption
+}
+
+func ExtractId(endCmd, formatFlag, id string) (string, error) {
+
+	v := url.Values{}
+
+	switch formatFlag {
+	case "table":
+		fallthrough
+	case "geojson":
+		fallthrough
+	case "json":
+		v.Set("format", "geojson")
+	case "text":
+		v.Set("format", "text")
+	case "csv":
+		v.Set("format", "csv")
+	default:
+		return "", ErrFlagFormatOption
+	}
+
+	validId, err := validateId(id)
+	if err != nil {
+		return "", err
+	}
+
+	v.Set("eventid", validId)
+
+	// Prepare URL Request
+	fullURL, err := url.Parse(FDSNENDPOINT)
+	if err != nil {
+		return "", err
+	}
+
+	path, err := url.JoinPath(fullURL.Path, endCmd)
+	if err != nil {
+		return "", err
+	}
+
+	fullURL.Path = path
+	fullURL.ForceQuery = true
+	fullURL.RawQuery = v.Encode()
+	return fullURL.String(), nil
+}
+
+func validateId(id string) (string, error) {
+
+	if strings.ContainsAny(id, "\"&*?-.+-^%()_") {
+		return "", ErrEventIdInvalid
+	}
+
+	validId := strings.TrimSpace(id)
+
+	return validId, nil
 }

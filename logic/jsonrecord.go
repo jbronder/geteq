@@ -79,17 +79,68 @@ func ExtractFeatures(res []byte) (Features, error) {
 	return f, nil
 }
 
+func ExtractSingleFeature(res []byte) (*Feature, error) {
+	f := new(Feature)
+	err := json.Unmarshal(res, f)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
+}
+
 func StdoutFeatures(features Features) {
 	if len(features) == 0 {
 		fmt.Fprintf(os.Stdout, "No records matched under the given criteria.\n")
 		return
 	}
-	
-	fmt.Printf("%s %s %6s %40s %6s\n", "Date-Time UTC+00:00", "Mag", "Place", "Lat", "Long")
+
+	fmt.Printf("%-10s %s %-4s %-42s %-5s %s\n", "EventId", "Date-Time UTC+00:00", "Mag", "Place", "Lat", "Long")
 	for _, f := range features {
 		dateTimeVal := time.UnixMilli(f.Props.Time).UTC()
 		dateTimeStr := dateTimeVal.Format(time.DateTime)
-		fmt.Fprintf(os.Stdout, "%s %3.2f %-41s %6.2f %7.2f\n",
-			dateTimeStr, f.Props.Mag, f.Props.Place, f.Geo.Coordinates[1], f.Geo.Coordinates[0])
+		fmt.Fprintf(os.Stdout, "%s %s %3.2f %-41s %6.2f %7.2f\n",
+			f.Id, dateTimeStr, f.Props.Mag, f.Props.Place, f.Geo.Coordinates[1], f.Geo.Coordinates[0])
 	}
+}
+
+// StdoutSingleEvent outputs detailed information about an earthquake event.
+func StdoutSingleEvent(f *Feature) {
+	if f == nil {
+		fmt.Fprintf(os.Stdout, "No record matched under the given criteria.\n")
+		return
+	}
+
+	datetime := time.UnixMilli(f.Props.Time).UTC()
+	datetimeStr := datetime.Format(time.DateTime)
+
+	updateDateTime := time.UnixMilli(f.Props.Updated).UTC()
+	updateDateTimeStr := updateDateTime.Format(time.DateTime)
+
+	fmt.Fprintf(os.Stdout, "Single Event Details\n--------------------\n")
+	fmt.Fprintf(os.Stdout, "Event Id: %s\n", f.Id)
+	fmt.Fprintf(os.Stdout, "Review Status: %s\n", f.Props.Status)
+	fmt.Fprintf(os.Stdout, "Time (UTC+00:00): %s\n", datetimeStr)
+	fmt.Fprintf(os.Stdout, "Updated Time (UTC+00:00): %s\n", updateDateTimeStr)
+	fmt.Fprintf(os.Stdout, "Time Zone Offset: %d\n", f.Props.Tz)
+	fmt.Fprintf(os.Stdout, "Place: %s\n", f.Props.Place)
+	fmt.Fprintf(os.Stdout, "Magnitude: %3.2f\n", f.Props.Mag)
+	fmt.Fprintf(os.Stdout, "Magnitude Type: %s\n", f.Props.MagType)
+	fmt.Fprintf(os.Stdout, "Depth: %.2f km\n", f.Geo.Coordinates[2])
+	fmt.Fprintf(os.Stdout, "Latitude: %.2f\n", f.Geo.Coordinates[1])
+	fmt.Fprintf(os.Stdout, "Longitude: %.2f\n", f.Geo.Coordinates[0])
+	fmt.Fprintf(os.Stdout, "Horizontal distance (in deg) from epicenter to the nearest station: %f\n", f.Props.Dmin)
+	fmt.Fprintf(os.Stdout, "Largest Azimuthal Gap between stations (deg): %.2f\n", f.Props.Gap)
+	fmt.Fprintf(os.Stdout, "Root-Mean-Square (RMS) Travel Time Residual (sec): %.3f\n", f.Props.Rms)
+	fmt.Fprintf(os.Stdout, "Seismic Event Type: %s\n", f.Props.Type)
+	fmt.Fprintf(os.Stdout, "PAGER Alert Level: %s\n", f.Props.Alert)
+	fmt.Fprintf(os.Stdout, "Number of Felt Reports of DYFI: %d\n", f.Props.Felt)
+	fmt.Fprintf(os.Stdout, "Intensity Level: %.2f\n", f.Props.Cdi)
+	fmt.Fprintf(os.Stdout, "Modified Mercalli Intensity (MMI): %.2f\n", f.Props.Mmi)
+	fmt.Fprintf(os.Stdout, "Event Significance: %d\n", f.Props.Sig)
+	fmt.Fprintf(os.Stdout, "Large Event in Oceanic Region: %d\n", f.Props.Tsunami)
+	fmt.Fprintf(os.Stdout, "Number of Stations used to determine location: %d\n", f.Props.Nst)
+	fmt.Fprintf(os.Stdout, "Associated Event Ids: %s\n", f.Props.Ids)
+	fmt.Fprintf(os.Stdout, "Network Contributors: %s\n", f.Props.Sources)
+	fmt.Fprintf(os.Stdout, "Preferred Contributor Id: %s\n", f.Props.Net)
+	fmt.Fprintf(os.Stdout, "Event Id Code: %s\n", f.Props.Code)
 }
