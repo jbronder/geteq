@@ -17,6 +17,11 @@ type ParseTimeTest struct {
 	err     error
 }
 
+type EventIdTest struct {
+	in, out string
+	err     error
+}
+
 func TestExtractMagnitude(t *testing.T) {
 	mTests := []MagnitudeTest{
 		{"6.0", "6.0", "6.0", nil},
@@ -72,6 +77,20 @@ func TestParseTime(t *testing.T) {
 		timeVal, err := parseTime(test.in)
 		if timeVal != test.out || err != test.err {
 			t.Errorf("parseTime(%q) = %v %v; want %v %v", test.in, timeVal, err, test.out, test.err)
+		}
+	}
+}
+
+func TestValidateId(t *testing.T) {
+	idTests := []EventIdTest{
+		{"ci40012345", "ci40012345", nil},
+		{"^ci12345678", "", ErrEventIdInvalid},
+	}
+
+	for _, test := range idTests {
+		id, err := validateId(test.in)
+		if id != test.out || err != test.err {
+			t.Errorf("validateId(%q) = %v %v; want %v %v", test.in, id, err, test.out, test.err)
 		}
 	}
 }
