@@ -65,6 +65,8 @@ type Geometry struct {
 	Coordinates []float64 `json:"coordinates"`
 }
 
+// ExtractFeatures unmarshals a list of earthquake events into Features to
+// prepare for formatting.
 func ExtractFeatures(res []byte) (Features, error) {
 	var usgsRes USGSResponse
 	err := json.Unmarshal(res, &usgsRes)
@@ -79,6 +81,8 @@ func ExtractFeatures(res []byte) (Features, error) {
 	return f, nil
 }
 
+// ExtractSingleFeature unmarshals one event into one Feature to prepare for
+// formatting.
 func ExtractSingleFeature(res []byte) (*Feature, error) {
 	f := new(Feature)
 	err := json.Unmarshal(res, f)
@@ -88,6 +92,9 @@ func ExtractSingleFeature(res []byte) (*Feature, error) {
 	return f, nil
 }
 
+// StdoutFeatures outputs to standard output a list of Features that were
+// unmarshaled from a response. As a snapshot, the main fields that are listed
+// for each event are: eventid, time, place, latitude, and longitude.
 func StdoutFeatures(features Features) {
 	if len(features) == 0 {
 		fmt.Fprintf(os.Stdout, "No records matched under the given criteria.\n")

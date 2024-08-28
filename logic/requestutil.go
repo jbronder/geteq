@@ -20,10 +20,11 @@ const (
 	FDSNENDPOINT = "https://earthquake.usgs.gov/fdsnws/event/1"
 	ALPHABET     = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	NONALPHABET  = "\"&*?-.+-^%(){}[]_@:|\\!~`,"
+	DIGITS       = "0123456789"
 )
 
-// ExtractRTParams parses the command line flag and returns a string filling
-// in the designated file name to send to the server.
+// ExtractRTParams parses the user flag values and returns a complete URL to
+// send to the server.
 func ExtractRTParams(formatFlag, magFlag, timeFlag string) (string, error) {
 	var magRange string
 	switch magFlag {
@@ -90,6 +91,8 @@ func RequestContent(apiPath string) ([]byte, error) {
 	return bContent, nil
 }
 
+// ExtractFDSNParams resolves user input flag values and pairs them with the
+// endpoint method to return a complete URL for a request.
 func ExtractFDSNParams(endCmd, magFlag, formatFlag, dateTimeFlag string) (string, error) {
 	v := url.Values{}
 
@@ -190,7 +193,7 @@ func extractMagnitude(mFlag string) (string, string, error) {
 	}
 
 	// exact magnitude
-	if strings.ContainsAny(mFlag, "0123456789") {
+	if strings.ContainsAny(mFlag, DIGITS) {
 		lower := strings.TrimSpace(mFlag)
 		upper := strings.TrimSpace(mFlag)
 		return lower, upper, nil
@@ -245,6 +248,8 @@ func parseTime(timeStr string) (string, error) {
 	return "", ErrFlagTimeOption
 }
 
+// ExtractId resolves an eventid flag value, a format flag and query method to
+// return a complete URL for a request.
 func ExtractId(endCmd, formatFlag, id string) (string, error) {
 
 	v := url.Values{}
