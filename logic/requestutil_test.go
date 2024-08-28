@@ -53,6 +53,7 @@ func TestExtractTime(t *testing.T) {
 		{"--", "", "", ErrFlagTimeOption},
 		{" , ", "", "", nil},
 		{",", "", "", nil},
+		{"", "","", nil},
 		{"2024-12-01-2024-12-02", "", "", ErrFlagTimeOption},
 	}
 

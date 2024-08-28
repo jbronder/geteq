@@ -19,6 +19,7 @@ const (
 	RTENDPOINT   = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary"
 	FDSNENDPOINT = "https://earthquake.usgs.gov/fdsnws/event/1"
 	ALPHABET     = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	NONALPHABET  = "\"&*?-.+-^%(){}[]_@:|\\!~`,"
 )
 
 // ExtractRTParams parses the command line flag and returns a string filling
@@ -200,6 +201,10 @@ func extractMagnitude(mFlag string) (string, string, error) {
 
 func extractTime(tFlag string) (string, string, error) {
 
+	if len(tFlag) == 0 {
+		return "", "", nil
+	}
+
 	if strings.Contains(tFlag, ",") {
 		fields := strings.Split(tFlag, ",")
 		begin := strings.TrimSpace(fields[0])
@@ -285,7 +290,7 @@ func ExtractId(endCmd, formatFlag, id string) (string, error) {
 
 func validateId(id string) (string, error) {
 
-	if strings.ContainsAny(id, "\"&*?-.+-^%()_") {
+	if strings.ContainsAny(id, NONALPHABET) {
 		return "", ErrEventIdInvalid
 	}
 
