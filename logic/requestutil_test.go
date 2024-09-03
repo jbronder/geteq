@@ -86,6 +86,11 @@ func TestValidateId(t *testing.T) {
 	idTests := []EventIdTest{
 		{"ci40012345", "ci40012345", nil},
 		{"^ci12345678", "", ErrEventIdInvalid},
+		{" ci40012345", "ci40012345", nil},
+		{"ci40012345 ", "ci40012345", nil},
+		{"\tci40012345", "ci40012345", nil},
+		{"ci40012345\t", "ci40012345", nil},
+		{"ci400 12345", "", ErrEventIdInvalid},
 	}
 
 	for _, test := range idTests {

@@ -301,5 +301,10 @@ func validateId(id string) (string, error) {
 
 	validId := strings.TrimSpace(id)
 
+	// check if the eventid contains spaces between characters
+	if strings.ContainsAny(validId, " ") {
+		return "", ErrEventIdInvalid	
+	}
+
 	return validId, nil
 }
