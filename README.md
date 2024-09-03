@@ -75,6 +75,15 @@ Retrieve records with magnitudes greater than 4.5 and formatted to output CSV:
 ```bash
 $ geteq fdsn q -m ">4.5" -o csv # NOTE: quotes are required
 ```
+
+Retrieve records with magnitudes less than 0.5 for one day formatted to JSON
+and then piped (`|`) to the `json.tool` Python module to "pretty print" to
+the terminal: 
+```bash
+# NOTE that the quotes are required for bounded magnitude searches
+$ geteq fdsn q -m "<0.5" -t 2024-02-05,2024-02-06 -o json | python3 -m json.tool
+```
+
 Retrieve details of a single event using an `eventid`:
 ```bash
 $ geteq fdsn query event uw10530748 # where uw10530748 is an eventid
