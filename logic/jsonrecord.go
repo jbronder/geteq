@@ -110,6 +110,30 @@ func StdoutFeatures(features Features) {
 	}
 }
 
+// resolveMagType provides a mapping from the short-form 2 or 3 letter magnitude
+// type into a more descriptive label of magnitude type. If a 2 or 3 letter
+// magnitude type is not present in the hash table, return the original magType
+// variable.
+func resolveMagType(magType string) string {
+	typeMapping := map[string]string{
+		"md":  "Duration Magnitude (Md)",
+		"ml":  "Richter Scale Magnitude (Ml)",
+		"ms":  "20 sec Surface Wave Magnitude (Ms)",
+		"mw":  "Moment Magnitude (Mw)",
+		"mww": "Moment Magnitude, W-Phase (Mww)",
+		"me":  "Energy Magnitude (Me)",
+		"mi":  "Integrated P-Wave Magnitude (Mi)",
+		"mb":  "Short-Period Body Wave Magnitude (Mb)",
+		"mlg": "Short-Period Surface Wave Magnitude (Mlg)",
+	}
+
+	if fullMagString, hasKey := typeMapping[magType]; hasKey {
+		return fullMagString
+	} else {
+		return magType
+	}
+}
+
 // StdoutSingleEvent outputs detailed information about an earthquake event.
 func StdoutSingleEvent(f *Feature) {
 	if f == nil {
@@ -131,7 +155,7 @@ func StdoutSingleEvent(f *Feature) {
 	fmt.Fprintf(os.Stdout, "Time Zone Offset: %d\n", f.Props.Tz)
 	fmt.Fprintf(os.Stdout, "Place: %s\n", f.Props.Place)
 	fmt.Fprintf(os.Stdout, "Magnitude: %3.2f\n", f.Props.Mag)
-	fmt.Fprintf(os.Stdout, "Magnitude Type: %s\n", f.Props.MagType)
+	fmt.Fprintf(os.Stdout, "Magnitude Type: %s\n", resolveMagType(f.Props.MagType))
 	fmt.Fprintf(os.Stdout, "Depth: %.2f km\n", f.Geo.Coordinates[2])
 	fmt.Fprintf(os.Stdout, "Latitude: %.2f\n", f.Geo.Coordinates[1])
 	fmt.Fprintf(os.Stdout, "Longitude: %.2f\n", f.Geo.Coordinates[0])
