@@ -12,7 +12,7 @@ using Cobra as the scaffold for the CLI. It parses commands and flags from users
 to send an HTTP request to USGS's real-time feed and historical earthquake data
 API and formats the response into a readable table to the terminal. It also
 forwards the request to return CSV and JSON formats of the data for further data
-processing and analysis.  data pipeline
+processing and analysis permitting the creation of data pipelines.
 
 
 ## Sources
